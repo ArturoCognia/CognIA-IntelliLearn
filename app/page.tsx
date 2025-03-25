@@ -1,11 +1,10 @@
-import { DashboardComponent } from "@/components/dashboard";
+//import { DashboardComponent } from "@/components/dashboard";
+import LandingPage from "@/components/landingPage/LandingPage";
 
 export default function Home() {
   return (
-    <div className="">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <DashboardComponent/>
-      </main>
+    <div className="container-app">
+        <LandingPage/>
     </div>
   );
 }
