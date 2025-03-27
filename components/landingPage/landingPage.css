@@ -52,3 +52,76 @@
     padding: 20px;
     color: rgba(19, 41, 68, 1);
 }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.testimonialItem{
+  width: 463px;
+  height: 139px;
+  border-radius: 16px;
+  box-shadow: 4px 3px 11.3px 0px rgba(0, 0, 0, 0.14);
+  background-color: rgba(239, 239, 239, 1);
+  padding: 10px;
+  display: flex;
+}
+.icon-testimonial{
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  font-size: 17px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@keyframes scroll-carousel {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.carousel-track {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: scroll-carousel 30s linear infinite;
+}
+.circle-blur {
+  width: 224px;
+  height: 430px;
+  border-radius: 50%; /* Para que se vea como una elipse */
+  background-color: rgba(240, 17, 17, 0.3); /* Un blanco translúcido */
+  filter: blur(69.3px);
+}
+.blur-circle-left {
+  position: absolute;
+  left: -80;
+  top: 66%;
+  transform: translateY(-50%);
+  width: 224px;
+  height: 430px;
+  border-radius: 50%;
+  background-color: #f5f1f1;
+  filter: blur(69.3px);
+  z-index: 1;
+}
+
+.blur-circle-right {
+  position: absolute;
+  right: -80px;
+  top: 66%;
+  transform: translateY(-50%);
+  width: 224px;
+  height: 430px;
+  border-radius: 50%;
+  background-color: #f5f1f1;
+  filter: blur(69.3px);
+  z-index: 1;
+}
