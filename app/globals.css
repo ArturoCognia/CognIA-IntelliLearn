@@ -29,6 +29,10 @@ body {
   font-size: 16px;
   padding: 10px 20px;
 }
+.btn-header:hover, .btn-login:hover{
+  background-color: rgba(60, 49, 163, 1);
+  color: #FFFFFF;
+}
 .btn-header-gradient{
   background: linear-gradient(86.79deg, #132944 0%, #3C31A3 111.2%);
   color: #ffffff;
@@ -64,6 +68,5 @@ body {
 }
 .footer{
   position: relative;
-  z-index: 2;
   color: #FFFFFF;
 }

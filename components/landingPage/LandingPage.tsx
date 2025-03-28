@@ -72,7 +72,7 @@ export default function LandingPage() {
         },
     ]
     return (
-        <div className="bg-white text-gray-800">                     
+        <div className="bg-white text-gray-800">
             {/* Hero Section */}
             <section className="bg-gradient-banner py-16 px-6 text-center md:text-left md:flex md:items-center md:justify-between gap-8">
                 <div className="max-w-xl mx-auto md:mx-0">
@@ -188,7 +188,7 @@ export default function LandingPage() {
 
             {/* Beneficios (Placeholder) */}
             <section className="text-center py-10">
-                <h2 className="text-[59px] font-bold text-[#1f1e6d]">Beneficios de nuestra plataforma</h2>
+                <h2 className="textCognIA">Beneficios de nuestra plataforma</h2>
             </section>
 
             {/* Sección informativa + chatbot */}
@@ -247,8 +247,32 @@ export default function LandingPage() {
             </section>
 
             {/* Sección de CTA */}
-            <section className="bg-gradient-to-r from-[#0B0D2A] to-[#2A1E90] py-20 text-white text-center rounded-2xl shadow-lg mx-4 md:mx-6">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <section className="relative bg-gradient-to-r from-[#0B0D2A] to-[#2A1E90] py-20 text-white text-center rounded-2xl shadow-lg mx-4 md:mx-6 overflow-hidden">
+                {/* SVG izquierdo */}
+                <div className="absolute left-0 top-0 h-full w-1/2">
+                <Image
+                                className="h-full w-full object-cover"
+                                src={'/assets/images/TexturaLeft.svg'}
+                                alt="textura-left"
+                                width={541}
+                                height={281}
+                                quality={100}
+                            />
+                </div>
+
+                {/* SVG derecho */}
+                <div className="absolute right-0 top-0 h-full w-1/2">
+                <Image
+                                className="h-full w-full object-cover"
+                                src={'/assets/images/TexturaReight.svg'}
+                                alt="textura-left"
+                                width={541}
+                                height={281}
+                                quality={100}
+                            />                </div>
+
+                {/* Contenido */}
+                <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6">
                     <h2 className="text-2xl sm:text-3xl md:text-[54px] font-bold mb-4">
                         ¿Listo para digitalizar tu oferta académica?
                     </h2>
@@ -265,7 +289,7 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            <section className="bg-white py-20 text-center relative">
+            <section className="bg-white py-20 text-center relative overflow-hidden">
                 <h2 className="text-[54px] font-bold mb-10 text-transparent bg-clip-text bg-gradient-to-r from-[rgba(19,41,68,1)] to-[rgba(60,49,163,1)]">
                     ¿Qué dicen nuestros clientes?
                 </h2>
