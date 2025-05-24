@@ -1,5 +1,6 @@
 import { FiUser } from 'react-icons/fi';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export const HeaderComponent = () => {
     return(
@@ -21,7 +22,7 @@ export const HeaderComponent = () => {
                             <a href="#" className="btn-header">Testimonios</a>
                             <button className="btn-header-gradient">Solicitar Demo</button>
                         </nav>
-                        <button className="btn-login"><FiUser className='text-[22px] mr-3' /> Log In</button>
+                        <Link href="/auth/login" className="btn-login"><FiUser className='text-[22px] mr-3' /> Log In</Link>
         
                     </header>
         </div>

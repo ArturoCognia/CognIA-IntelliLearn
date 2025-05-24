@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Manrope } from 'next/font/google'
-import { HeaderComponent } from "@/components/common/header";
-import { FooterComponet } from "@/components/common/footer";
+import { FloatingAssistant } from "@/components/common/FloatingAssistant";
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -23,9 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={manrope.className}>
-        <HeaderComponent/>
         {children}
-        <FooterComponet/>
+        <FloatingAssistant />
       </body>
     </html>
   );

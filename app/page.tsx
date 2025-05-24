@@ -1,12 +1,5 @@
-//import { DashboardComponent } from "@/components/dashboard";
-import FloatingAssistantButton from "@/components/common/floatingAssistantButton";
-import LandingPage from "@/components/landingPage/LandingPage";
+import { redirect } from 'next/navigation'
 
-export default function Home() {
-  return (
-    <div className="container-app">
-        <LandingPage/>
-        <FloatingAssistantButton/>
-    </div>
-  );
-}
+export default function HomePage() {
+  redirect('/')
+} 
