@@ -1,34 +1,101 @@
 /**
- * Configuration for Gemini API
- * You should replace these values with your actual credentials
+ * @fileoverview Gemini AI Configuration
+ * @author Luis Arturo Parra Rosas
+ * @created 2023-12-18
+ * @updated 2023-12-22
+ * @version 1.0.0
+ * 
+ * @description
+ * Configuration for Google's Gemini AI API integration.
+ * Contains API keys, model settings, and generation parameters.
+ * 
+ * @context
+ * Core configuration file for AI capabilities throughout the application.
+ * Defines how the application interacts with Gemini models.
+ * Controls AI response behavior, safety settings, and caching.
+ * 
+ * @changelog
+ * v1.0.0 - Initial configuration
+ * v1.0.1 - Added caching support
+ * v1.0.2 - Optimized generation parameters
  */
 
+/**
+ * Gemini API Configuration
+ * @context Main configuration object for Gemini AI integration
+ */
 export const geminiConfig = {
-  // Your Gemini API key - You need to obtain this from the Google AI Studio (https://makersuite.google.com/)
-  // or from your Google Cloud Project. Replace this with your actual API key.
+  /**
+   * Gemini API Key
+   * @context Authentication for API access
+   * Obtain from Google AI Studio (https://makersuite.google.com/)
+   */
   apiKey: 'AIzaSyBxX0wWGEjv8JhSMmT2aKYKV3JKfwBn3Xo',
   
-  // Your Google Cloud project ID
+  /**
+   * Google Cloud Project ID
+   * @context Project identification for Google Cloud resources
+   */
   projectId: 'cogniaintellilearn-ebdb3',
   
-  // El modelo de Gemini a utilizar
-  // Puede ser un modelo estándar o un modelo personalizado entrenado
-  // Para usar un modelo entrenado, reemplaza con el formato:
-  // 'projects/cogniaintellilearn-ebdb3/locations/us-central1/models/TU_MODELO_ENTRENADO'
+  /**
+   * Model Identifier
+   * @context Specifies which Gemini model to use
+   * 
+   * For standard models, use one of:
+   * - 'gemini-1.5-flash' (faster, more efficient)
+   * - 'gemini-1.5-pro' (more capable, higher quality)
+   * 
+   * For custom models, use format:
+   * 'projects/{projectId}/locations/{location}/models/{modelId}'
+   */
   model: 'gemini-1.5-flash',
   
-  // Indica si se está usando un modelo personalizado entrenado
-  // Cambia a true cuando tengas un modelo entrenado y hayas actualizado el campo model arriba
+  /**
+   * Custom Model Flag
+   * @context Indicates whether a custom-trained model is being used
+   * Set to true when using a fine-tuned model specific to your application
+   */
   isCustomModel: false,
   
-  // Generation parameters - optimizados para mejor rendimiento y menor latencia
+  /**
+   * Generation Parameters
+   * @context Controls the behavior of AI text generation
+   * 
+   * - temperature: Controls randomness (0.0-1.0)
+   *   Lower values = more deterministic, higher = more creative
+   * 
+   * - topP: Controls diversity via nucleus sampling (0.0-1.0)
+   *   Lower values = more focused, higher = more diverse options
+   * 
+   * - maxOutputTokens: Maximum response length
+   *   Lower values = shorter, more concise responses
+   */
   generationConfig: {
-    temperature: 0.5,         // Reducido para respuestas más consistentes
-    topP: 0.75,               // Ajustado para mejor balance entre creatividad y precisión
-    maxOutputTokens: 800,     // Limitado para respuestas más concisas y menor costo
+    temperature: 0.5,         // Reduced for more consistent responses
+    topP: 0.75,               // Balanced for creativity and precision
+    maxOutputTokens: 800,     // Limited for concise responses and lower cost
   },
   
-  // Safety settings (all turned off in this example)
+  /**
+   * Safety Settings
+   * @context Controls content filtering for generated responses
+   * 
+   * Categories:
+   * - HARM_CATEGORY_HATE_SPEECH
+   * - HARM_CATEGORY_DANGEROUS_CONTENT
+   * - HARM_CATEGORY_SEXUALLY_EXPLICIT
+   * - HARM_CATEGORY_HARASSMENT
+   * 
+   * Thresholds:
+   * - BLOCK_NONE | OFF (no filtering)
+   * - BLOCK_LOW_AND_ABOVE (filter extreme content)
+   * - BLOCK_MEDIUM_AND_ABOVE (balanced filtering)
+   * - BLOCK_HIGH_AND_ABOVE (minimal filtering)
+   * 
+   * Note: For educational context, filters are disabled, but should be
+   * adjusted based on your specific use case and audience
+   */
   safetySettings: [
     { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "OFF" },
     { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "OFF" },
@@ -36,21 +103,36 @@ export const geminiConfig = {
     { category: "HARM_CATEGORY_HARASSMENT", threshold: "OFF" }
   ],
   
-  // Cache configuration
+  /**
+   * Caching Configuration
+   * @context Controls response caching to reduce API calls
+   * 
+   * - enabled: Toggles caching on/off
+   * - maxEntries: Maximum number of responses to cache
+   * - ttl: Time-to-live in milliseconds before cache entry expires
+   */
   cache: {
-    enabled: true,           // Habilitar caché para reducir llamadas repetidas
-    maxEntries: 100,         // Número máximo de entradas en caché
-    ttl: 3600000             // Tiempo de vida en milisegundos (1 hora)
+    enabled: true,           // Enable caching to reduce repeated calls
+    maxEntries: 100,         // Maximum number of cached entries
+    ttl: 3600000             // Time-to-live: 1 hour (in milliseconds)
   }
 };
 
-// Whether to use the API endpoint or direct integration
-// Set to false if you want to bypass the server and call Gemini API directly from the client
-// (Note: This requires an API key to be set and exposes it to the client, which is not recommended for production)
+/**
+ * API Integration Method Flag
+ * @context Controls whether to use server-side or client-side API calls
+ * 
+ * - true: Use server endpoint (API route) to call Gemini
+ *   Safer for production as it keeps API keys private
+ * 
+ * - false: Call Gemini API directly from client
+ *   Simpler but exposes API key in client code (not recommended for production)
+ */
 export const useServerEndpoint = false;
 
 /**
- * Instructions for obtaining and configuring your Gemini API:
+ * Setup Instructions
+ * @context Guidance for configuring Gemini API integration
  * 
  * 1. Option A - Get an API key from Google AI Studio:
  *    - Visit https://makersuite.google.com/

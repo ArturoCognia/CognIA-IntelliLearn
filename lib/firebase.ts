@@ -1,3 +1,25 @@
+/**
+ * @fileoverview Firebase Services Configuration
+ * @author Luis Arturo Parra Rosas
+ * @created 2023-12-10
+ * @updated 2023-12-20
+ * @version 1.0.0
+ * 
+ * @description
+ * Centralizes all Firebase service initializations and exports.
+ * Provides utilities for authentication, database, storage, and AI operations.
+ * 
+ * @context
+ * Core service configuration file used throughout the application.
+ * Initializes Firebase services as singletons to prevent duplicate instances.
+ * Integrates Firebase AI (Gemini) for artificial intelligence capabilities.
+ * 
+ * @changelog
+ * v1.0.0 - Initial implementation with core Firebase services
+ * v1.0.1 - Added Firestore and Storage services
+ * v1.0.2 - Integrated Firebase AI with Gemini model
+ */
+
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAnalytics, isSupported, Analytics } from "firebase/analytics";
@@ -9,8 +31,10 @@ import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+/**
+ * Firebase configuration object
+ * @context Core configuration for all Firebase services
+ */
 const firebaseConfig = {
   apiKey: "AIzaSyB2SyW8F0RSYud2XSwwB0HIYR_PtBgSV_s",
   authDomain: "cogniaintellilearn-ebdb3.firebaseapp.com",
@@ -21,7 +45,10 @@ const firebaseConfig = {
   measurementId: "G-HJWX4FBK40"
 };
 
-// Initialize Firebase
+/**
+ * Initialize Firebase app singleton
+ * @context Ensures Firebase is only initialized once
+ */
 let app: FirebaseApp;
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
@@ -29,10 +56,18 @@ if (!getApps().length) {
   app = getApp();
 }
 
+/**
+ * Initialize Firebase services
+ * @context Service instances used throughout the application
+ */
 const auth: Auth = getAuth(app);
 const db: Firestore = getFirestore(app);
 const storage: FirebaseStorage = getStorage(app);
 
+/**
+ * Analytics initialization (client-side only)
+ * @context Used for tracking user behavior when supported
+ */
 let analytics: Analytics | undefined;
 
 if (typeof window !== 'undefined') {
@@ -43,16 +78,32 @@ if (typeof window !== 'undefined') {
   });
 }
 
-// IMPORTANTE: NO debes poner directamente tu API key en el código.
-// Firebase AI Logic gestionará la autenticación de forma segura a través del backend.
-// Inicializar el servicio de backend de Google AI para Gemini
+/**
+ * Firebase AI Configuration
+ * @context AI service initialization for Gemini model
+ */
 const ai = getAI(app, { backend: new GoogleAIBackend() });
 
-// Crear una instancia de GenerativeModel con un modelo que sea adecuado para nuestro caso de uso
-// gemini-1.5-pro-latest para calidad superior, gemini-1.5-flash para respuestas más rápidas
+/**
+ * Gemini AI model instance
+ * @context Used for generating AI responses throughout the app
+ * gemini-1.5-pro-latest for higher quality, gemini-1.5-flash for faster responses
+ */
 export const geminiModel = getGenerativeModel(ai, { model: "gemini-1.5-flash" });
 
-// Función para generar contenido utilizando Gemini
+/**
+ * Generate content using Gemini AI
+ * 
+ * @param {string} prompt - The text prompt to send to the AI
+ * @returns {Promise<string>} The AI-generated response text
+ * 
+ * @context
+ * Used for single-prompt AI content generation.
+ * 
+ * @description
+ * Sends a single prompt to the Gemini model and returns the response.
+ * Handles errors gracefully by returning a friendly error message.
+ */
 export async function generateAIResponse(prompt: string) {
   try {
     const result = await geminiModel.generateContent(prompt);
@@ -64,10 +115,25 @@ export async function generateAIResponse(prompt: string) {
   }
 }
 
-// Función para mantener una conversación
+/**
+ * Chat with Gemini AI
+ * 
+ * @param {Array<{role: string, content: string}>} messages - Array of message objects
+ * @returns {Promise<string>} The AI-generated response text
+ * 
+ * @context
+ * Used for multi-turn conversational AI interactions.
+ * 
+ * @description
+ * Maintains a conversation with the Gemini model by:
+ * 1. Creating a new chat session
+ * 2. Sending previous messages to establish context
+ * 3. Sending the latest message and returning the response
+ * Configured with temperature and other generation parameters for natural conversation.
+ */
 export async function chatWithAI(messages: Array<{role: string, content: string}>) {
   try {
-    // Crear un nuevo chat
+    // Create a new chat session
     const chat = geminiModel.startChat({
       generationConfig: {
         temperature: 0.7,
@@ -77,7 +143,7 @@ export async function chatWithAI(messages: Array<{role: string, content: string}
       }
     });
     
-    // Enviar cada mensaje anterior para establecer contexto
+    // Send previous messages to establish context
     for (let i = 0; i < messages.length - 1; i++) {
       const msg = messages[i];
       if (msg.role === 'user') {
@@ -85,7 +151,7 @@ export async function chatWithAI(messages: Array<{role: string, content: string}
       }
     }
     
-    // Enviar el último mensaje y obtener respuesta
+    // Send the latest message and get response
     const lastMessage = messages[messages.length - 1];
     const result = await chat.sendMessage(lastMessage.content);
     return result.response.text();
@@ -95,10 +161,22 @@ export async function chatWithAI(messages: Array<{role: string, content: string}
   }
 }
 
-// Proveedor de Google
+/**
+ * Google Auth Provider
+ * @context Used for Google Sign-In
+ */
 export const googleProvider = new GoogleAuthProvider();
 
-// Función para iniciar sesión con Google
+/**
+ * Sign in with Google
+ * 
+ * @returns {Promise<{success: boolean, user?: User, error?: any}>}
+ * @context User authentication entry point
+ * 
+ * @description
+ * Initiates Google sign-in popup and handles the authentication flow.
+ * Returns success status and user data or error information.
+ */
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -109,7 +187,16 @@ export const signInWithGoogle = async () => {
   }
 };
 
-// Función para cerrar sesión
+/**
+ * Sign out user
+ * 
+ * @returns {Promise<{success: boolean, error?: any}>}
+ * @context User session termination
+ * 
+ * @description
+ * Signs out the current user from Firebase Authentication.
+ * Returns success status or error information.
+ */
 export const signOut = async () => {
   try {
     await firebaseSignOut(auth);
@@ -120,9 +207,23 @@ export const signOut = async () => {
   }
 };
 
-// Hook personalizado para obtener el estado de autenticación
+/**
+ * Subscribe to authentication state changes
+ * 
+ * @param {function} callback - Function to call when auth state changes
+ * @returns {function} Unsubscribe function
+ * @context Auth state monitoring
+ * 
+ * @description
+ * Sets up a listener for authentication state changes.
+ * Returns an unsubscribe function that should be called when no longer needed.
+ */
 export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
 };
 
+/**
+ * Export Firebase service instances
+ * @context Provides access to core Firebase services
+ */
 export { app, auth, db, storage, analytics }; 

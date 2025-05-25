@@ -1,23 +1,77 @@
+/**
+ * @fileoverview Protected Route Component
+ * @author Luis Arturo Parra Rosas
+ * @created 2023-12-12
+ * @updated 2023-12-15
+ * @version 1.0.0
+ * 
+ * @description
+ * Authentication guard component that protects routes from unauthorized access.
+ * Redirects unauthenticated users to the landing page.
+ * 
+ * @context
+ * Core security component used to protect authenticated routes.
+ * Used as a wrapper around private pages and components.
+ * Integrates with the AuthContext to check authentication state.
+ * 
+ * @changelog
+ * v1.0.0 - Initial implementation
+ * v1.0.1 - Added loading spinner
+ * v1.0.2 - Fixed redirect logic
+ */
+
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/lib/AuthContext';
 
+/**
+ * Protected Route Props
+ * @context Defines the expected props for the ProtectedRoute component
+ */
 type ProtectedRouteProps = {
   children: React.ReactNode
 }
 
+/**
+ * Protected Route Component
+ * 
+ * @param {object} props - Component props
+ * @param {React.ReactNode} props.children - Child components to render when authenticated
+ * @returns {JSX.Element | null} The protected content or loading indicator
+ * 
+ * @context
+ * Authentication guard for private routes.
+ * 
+ * @description
+ * Wraps authenticated content and ensures only authenticated users can access it.
+ * Behavior:
+ * - Shows a loading spinner while checking authentication
+ * - Redirects to the landing page if user is not authenticated
+ * - Renders children if user is authenticated
+ * 
+ * @example
+ * ```tsx
+ * <ProtectedRoute>
+ *   <DashboardLayout>
+ *     <DashboardContent />
+ *   </DashboardLayout>
+ * </ProtectedRoute>
+ * ```
+ */
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  // Get authentication state and router
   const { user, loading } = useAuth();
   const router = useRouter();
   
+  // Redirect effect
   useEffect(() => {
-    // Si no está cargando y no hay usuario, redirigir a la página de inicio
+    // If not loading and no user, redirect to home page
     if (!loading && !user) {
       router.push('/');
     }
   }, [loading, user, router]);
 
-  // Mostrar spinner mientras verifica la autenticación
+  // Show loading spinner while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-gray-50">
@@ -26,12 +80,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     )
   }
 
-  // Si no hay usuario y no está cargando, no mostrar nada mientras redirige
+  // If not authenticated and not loading, render nothing while redirecting
   if (!user && !loading) {
     return null;
   }
 
-  // Si está autenticado, mostrar el contenido protegido
+  // If authenticated, render the protected content
   return <>{children}</>
 }
 

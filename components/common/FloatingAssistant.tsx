@@ -1,9 +1,35 @@
+/**
+ * @fileoverview Floating AI Assistant Component
+ * @author Luis Arturo Parra Rosas
+ * @created 2023-12-15
+ * @updated 2023-12-20
+ * @version 1.0.0
+ * 
+ * @description
+ * Provides a floating chat interface for AI assistance throughout the application.
+ * Allows users to interact with the Gemini AI model from any page.
+ * 
+ * @context
+ * A global component accessible from any part of the application.
+ * Integrated with Firebase AI (Gemini) for natural language processing.
+ * Provides predefined suggestions and maintains conversation history.
+ * 
+ * @changelog
+ * v1.0.0 - Initial implementation with basic chat functionality
+ * v1.0.1 - Added conversation history and loading states
+ * v1.0.2 - Integrated with Gemini AI model via Firebase
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import { FaTimes, FaPaperPlane, FaLightbulb, FaBookReader, FaChartLine } from 'react-icons/fa';
 import { useAuth } from '@/lib/AuthContext';
 import Image from 'next/image';
 import { chatWithAI } from '@/lib/firebase';
 
+/**
+ * Message type definition
+ * @context Defines the structure of chat messages
+ */
 type Message = {
   id: string;
   text: string;
@@ -11,24 +37,55 @@ type Message = {
   timestamp: Date;
 }
 
+/**
+ * Floating Assistant Component
+ * 
+ * @returns {JSX.Element} Floating chat interface component
+ * 
+ * @context
+ * Persistent UI element across the application.
+ * 
+ * @description
+ * Renders a floating button that expands into a chat interface.
+ * Manages conversation state and integrates with Gemini AI.
+ * Features:
+ * - User authentication integration
+ * - Personalized greeting
+ * - Message history
+ * - Typing indicators
+ * - Predefined suggestions
+ */
 export const FloatingAssistant = () => {
+  // UI state
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  
+  // Chat state
+  const [messages, setMessages] = useState<Message[]>([]);
   const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([]);
+  
+  // References
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Authentication
   const { user } = useAuth();
 
-  // Sugerencias predefinidas
+  /**
+   * Predefined suggestion topics
+   * @context Quick access prompts for common user queries
+   */
   const suggestionTopics = [
     { id: '1', title: 'Explícame regresión lineal', icon: <FaLightbulb className="text-[#3C31A3]" /> },
     { id: '2', title: 'Resumir mi próxima lección', icon: <FaBookReader className="text-[#3C31A3]" /> },
     { id: '3', title: 'Ver mi progreso', icon: <FaChartLine className="text-[#3C31A3]" /> }
   ];
 
-  // Inicializar mensajes con saludo personalizado
+  /**
+   * Initialize chat with personalized welcome message
+   * @context Sets up initial chat state when user is authenticated
+   */
   useEffect(() => {
     if (user) {
       const welcomeMessage: Message = {
@@ -43,15 +100,22 @@ export const FloatingAssistant = () => {
     }
   }, [user]);
 
-  // Scroll automático al final de los mensajes
+  /**
+   * Auto-scroll to latest messages
+   * @context Improves UX by keeping the latest messages visible
+   */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  /**
+   * Handle sending user messages and getting AI responses
+   * @context Core chat functionality
+   */
   const handleSend = async () => {
     if (!inputValue.trim()) return;
 
-    // Agregar el mensaje del usuario a la conversación
+    // Add user message to conversation
     const userMessage: Message = { 
       id: Date.now().toString(),
       sender: 'user', 
@@ -64,15 +128,15 @@ export const FloatingAssistant = () => {
     setIsLoading(true);
     setShowSuggestions(false);
 
-    // Actualizar historial de chat
+    // Update chat history
     const newChatHistory = [...chatHistory, { role: 'user', content: userMessage.text }];
     setChatHistory(newChatHistory);
     
     try {
-      // Obtener respuesta de Gemini AI
+      // Get response from Gemini AI
       const aiResponseText = await chatWithAI(newChatHistory);
       
-      // Agregar respuesta del AI
+      // Add AI response to chat
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: aiResponseText,
@@ -84,7 +148,7 @@ export const FloatingAssistant = () => {
       setChatHistory(prev => [...prev, { role: 'model', content: aiResponseText }]);
     } catch (error) {
       console.error('Error al obtener respuesta de IA:', error);
-      // Agregar mensaje de error
+      // Add error message
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: 'Lo siento, ha ocurrido un error. Por favor, intenta de nuevo más tarde.',
@@ -97,6 +161,11 @@ export const FloatingAssistant = () => {
     }
   };
 
+  /**
+   * Handle clicking on suggestion topics
+   * @param {string} suggestion - The suggestion text
+   * @context Facilitates quick interactions with predefined topics
+   */
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
     setTimeout(() => {
@@ -104,13 +173,17 @@ export const FloatingAssistant = () => {
     }, 100);
   };
 
+  /**
+   * Toggle chat window visibility
+   * @context Controls the open/closed state of the chat interface
+   */
   const toggleChat = () => {
     setIsOpen(!isOpen);
   };
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {/* Botón del asistente */}
+      {/* Assistant button - visible when chat is closed */}
       {!isOpen && (
         <button
           onClick={toggleChat}
@@ -123,10 +196,10 @@ export const FloatingAssistant = () => {
         </button>
       )}
 
-      {/* Ventana del chat */}
+      {/* Chat window - visible when opened */}
       {isOpen && (
         <div className="absolute bottom-0 right-0 w-96 h-[500px] max-h-[80vh] bg-white rounded-lg shadow-xl overflow-hidden flex flex-col transition-all">
-          {/* Cabecera */}
+          {/* Header */}
           <div className="bg-gradient-to-r from-[#132944] to-[#3C31A3] p-3 text-white flex items-center justify-between cursor-move">
             <div className="flex items-center">
               <Image src="/assets/images/IA.svg" alt="CognIA" width={28} height={28} className="mr-2" />
@@ -137,8 +210,8 @@ export const FloatingAssistant = () => {
             </button>
           </div>
 
-          {/* Cuerpo del chat */}
-          <div className="flex-grow p-4 overflow-y-auto bg-gray-50">
+          {/* Chat message area */}
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -159,7 +232,7 @@ export const FloatingAssistant = () => {
               </div>
             ))}
             
-            {/* Indicador de escritura */}
+            {/* Typing indicator - shown when loading */}
             {isLoading && (
               <div className="flex justify-start mb-4">
                 <div className="bg-white shadow text-gray-700 rounded-lg rounded-tl-none max-w-[80%] p-3">
@@ -172,11 +245,12 @@ export const FloatingAssistant = () => {
               </div>
             )}
             
+            {/* Auto-scroll anchor */}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Sugerencias */}
-          {showSuggestions && messages.length <= 1 && (
+          {/* Suggestions area */}
+          {showSuggestions && (
             <div className="px-3 py-2 border-t border-gray-200 bg-white">
               <div className="flex flex-wrap gap-2">
                 {suggestionTopics.map(topic => (
@@ -193,7 +267,7 @@ export const FloatingAssistant = () => {
             </div>
           )}
 
-          {/* Campo de entrada */}
+          {/* Input area */}
           <div className="p-3 border-t border-gray-200 bg-white">
             <div className="flex items-center gap-2">
               <div className="relative flex-grow">

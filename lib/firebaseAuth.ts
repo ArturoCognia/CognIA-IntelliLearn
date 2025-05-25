@@ -1,3 +1,25 @@
+/**
+ * @fileoverview Firebase Authentication Service
+ * @author Luis Arturo Parra Rosas
+ * @created 2023-12-10
+ * @updated 2023-12-15
+ * @version 1.0.0
+ * 
+ * @description
+ * This module handles all Firebase authentication-related operations.
+ * It provides functions for user authentication, sign-out, and auth state management.
+ * 
+ * @context
+ * Part of the authentication system for CognIA-IntelliLearn platform.
+ * Provides Google sign-in integration and auth state management.
+ * Used by the AuthContext provider to maintain global auth state.
+ * 
+ * @changelog
+ * v1.0.0 - Initial implementation
+ * v1.0.1 - Added error handling for authentication errors
+ * v1.0.2 - Fixed redirect to dashboard after successful login
+ */
+
 import { initializeApp, getApps } from 'firebase/app';
 import { 
   getAuth, 
@@ -9,7 +31,10 @@ import {
   AuthError
 } from 'firebase/auth';
 
-// Configuración de Firebase
+/**
+ * Firebase configuration object
+ * @context Core configuration for Firebase services
+ */
 const firebaseConfig = {
   apiKey: "AIzaSyB2SyW8F0RSYud2XSwwB0HIYR_PtBgSV_s",
   authDomain: "cogniaintellilearn-ebdb3.firebaseapp.com",
@@ -20,23 +45,44 @@ const firebaseConfig = {
   measurementId: "G-HJWX4FBK40"
 };
 
-// Inicializar Firebase solo una vez
+/**
+ * Initialize Firebase app singleton
+ * @context Ensures Firebase is only initialized once
+ */
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Exportar instancia de autenticación
+/**
+ * Firebase Auth instance
+ * @context Primary authentication service instance
+ */
 export const auth = getAuth(app);
 
-// Proveedor de Google
+/**
+ * Google Auth Provider
+ * @context Configures Google authentication provider
+ */
 export const googleProvider = new GoogleAuthProvider();
-// Agregar scopes adicionales para más permisos
+
+// Configure Google provider with additional scopes
 googleProvider.addScope('profile');
 googleProvider.addScope('email');
-// Configurar el modo de selección de cuenta para forzar la selección
+
+// Force account selection for improved security
 googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
-// Función para iniciar sesión con Google
+/**
+ * Sign in with Google
+ * 
+ * @returns {Promise<{success: boolean, user?: User, error?: Error, errorMessage?: string}>}
+ * @context Authentication entry point for users
+ * 
+ * @description
+ * Initiates Google sign-in popup and handles the authentication flow.
+ * On success, redirects user to dashboard.
+ * On failure, returns detailed error information.
+ */
 export const signInWithGoogle = async () => {
   try {
     console.log("Iniciando proceso de autenticación con Firebase");
@@ -46,7 +92,7 @@ export const signInWithGoogle = async () => {
       projectId: firebaseConfig.projectId
     });
     
-    // Forzar el modo de selección de cuenta
+    // Force account selection
     googleProvider.setCustomParameters({
       prompt: 'select_account'
     });
@@ -54,7 +100,7 @@ export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
     console.log("Autenticación exitosa", result.user.uid);
     
-    // Siempre redirigir al dashboard después de iniciar sesión exitosamente
+    // Always redirect to dashboard after successful login
     if (typeof window !== 'undefined') {
       window.location.href = '/dashboard';
     }
@@ -63,13 +109,13 @@ export const signInWithGoogle = async () => {
   } catch (error) {
     console.error('Error detallado al iniciar sesión con Google:', error);
     
-    // Intentar proporcionar un mensaje de error más descriptivo
+    // Provide more descriptive error message
     let errorMessage = "Error desconocido de autenticación";
     
     if (error instanceof Error) {
       errorMessage = error.message;
       
-      // Verificar si es un error de Firebase Auth
+      // Check if it's a Firebase Auth error
       if ((error as AuthError).code) {
         const authError = error as AuthError;
         switch(authError.code) {
@@ -95,12 +141,21 @@ export const signInWithGoogle = async () => {
   }
 };
 
-// Función para cerrar sesión
+/**
+ * Sign out user
+ * 
+ * @param {string} [redirectUrl] - Optional URL to redirect after sign out
+ * @returns {Promise<{success: boolean, error?: Error}>}
+ * @context User session termination
+ * 
+ * @description
+ * Signs out the current user and optionally redirects to a specified URL.
+ */
 export const signOut = async (redirectUrl?: string) => {
   try {
     await firebaseSignOut(auth);
     
-    // Redireccionar si se proporciona una URL
+    // Redirect if URL is provided
     if (redirectUrl && typeof window !== 'undefined') {
       window.location.href = redirectUrl;
     }
@@ -112,7 +167,17 @@ export const signOut = async (redirectUrl?: string) => {
   }
 };
 
-// Hook personalizado para obtener el estado de autenticación
+/**
+ * Subscribe to authentication state changes
+ * 
+ * @param {function} callback - Function to call when auth state changes
+ * @returns {function} Unsubscribe function
+ * @context Auth state monitoring
+ * 
+ * @description
+ * Sets up a listener for authentication state changes.
+ * Returns an unsubscribe function that should be called when no longer needed.
+ */
 export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
 }; 

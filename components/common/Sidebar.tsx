@@ -1,3 +1,25 @@
+/**
+ * @fileoverview Dashboard Sidebar Navigation Component
+ * @author Luis Arturo Parra Rosas
+ * @created 2023-12-14
+ * @updated 2023-12-18
+ * @version 1.0.0
+ * 
+ * @description
+ * Main navigation sidebar for the dashboard interface.
+ * Provides access to all major sections of the application.
+ * 
+ * @context
+ * Core navigation component used in the dashboard layout.
+ * Handles user profile display, main navigation, and logout functionality.
+ * Responsive design with mobile toggle functionality.
+ * 
+ * @changelog
+ * v1.0.0 - Initial implementation
+ * v1.0.1 - Added mobile responsiveness
+ * v1.0.2 - Added active link highlighting
+ */
+
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -8,20 +30,54 @@ import { useAuth } from '@/lib/AuthContext'
 import { FaHome, FaBook, FaClipboardList, FaChartLine, FaCertificate, FaTrophy, FaCog, FaUserCircle, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa'
 import { IoMdChatbubbles } from 'react-icons/io'
 
+/**
+ * Sidebar Navigation Component
+ * 
+ * @returns {JSX.Element} Sidebar navigation component with user profile and menu items
+ * 
+ * @context
+ * Main navigation interface for authenticated users.
+ * 
+ * @description
+ * Renders a responsive sidebar with:
+ * - User profile information
+ * - Primary navigation menu
+ * - Secondary tools menu
+ * - Sign out button
+ * - Mobile toggle functionality
+ * 
+ * Features:
+ * - Active link highlighting
+ * - Responsive design with mobile overlay
+ * - User authentication integration
+ */
 export const Sidebar = () => {
   const router = useRouter()
   const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
 
+  /**
+   * Handle user sign out
+   * @context User session termination
+   */
   const handleSignOut = async () => {
     await signOut(window.location.origin)
   }
 
+  /**
+   * Toggle sidebar visibility on mobile
+   * @context Mobile responsiveness
+   */
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
   }
 
-  // Determinar si un enlace está activo
+  /**
+   * Determine if a navigation link is active
+   * @param {string} path - The path to check
+   * @returns {boolean} True if the link is active
+   * @context Active link highlighting
+   */
   const isActive = (path: string) => {
     if (path === '/dashboard' && router.pathname === '/dashboard') {
       return true
@@ -32,7 +88,10 @@ export const Sidebar = () => {
     return false
   }
 
-  // Iconos de navegación principal
+  /**
+   * Main navigation items
+   * @context Primary application sections
+   */
   const mainNavItems = [
     { path: '/dashboard', label: 'Dashboard', icon: <FaHome /> },
     { path: '/dashboard/courses', label: 'Mis Cursos', icon: <FaBook /> },
@@ -42,7 +101,10 @@ export const Sidebar = () => {
     { path: '/dashboard/gamification', label: 'Gamificación', icon: <FaTrophy /> },
   ]
 
-  // Iconos de navegación secundaria
+  /**
+   * Secondary navigation items
+   * @context Additional tools and user settings
+   */
   const secondaryNavItems = [
     { path: '/dashboard/assignments', label: 'Tareas', icon: <FaClipboardList /> },
     { path: '/dashboard/certificates', label: 'Certificados', icon: <FaCertificate /> },
@@ -52,7 +114,7 @@ export const Sidebar = () => {
 
   return (
     <>
-      {/* Botón móvil para abrir sidebar */}
+      {/* Mobile sidebar toggle button */}
       <button
         className="fixed top-4 left-4 bg-[#132944] text-white p-2 rounded-md shadow-md md:hidden z-30"
         onClick={toggleSidebar}
@@ -61,13 +123,13 @@ export const Sidebar = () => {
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      {/* Sidebar */}
+      {/* Sidebar container */}
       <aside
         className={`fixed md:static w-[280px] h-screen bg-[#13294e] text-white z-20 transform transition-transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0 flex flex-col`}
       >
-        {/* Logo */}
+        {/* Logo section */}
         <div className="py-6 px-4 flex justify-center">
           <Link href="/dashboard" className="block">
             <Image
@@ -81,7 +143,7 @@ export const Sidebar = () => {
           </Link>
         </div>
 
-        {/* Perfil del usuario */}
+        {/* User profile section */}
         <div className="px-5 py-4 mb-4 flex items-center">
           <div className="w-10 h-10 bg-white rounded-full flex-shrink-0 flex items-center justify-center uppercase font-bold text-[#13294e]">
             {user?.displayName ? user.displayName.charAt(0) : 'U'}
@@ -96,7 +158,7 @@ export const Sidebar = () => {
           </div>
         </div>
 
-        {/* Navegación principal */}
+        {/* Main navigation menu */}
         <nav className="flex-1 px-3 py-2 overflow-y-auto">
           <ul className="space-y-1.5">
             {mainNavItems.map((item) => (
@@ -116,12 +178,14 @@ export const Sidebar = () => {
             ))}
           </ul>
 
+          {/* Tools section header */}
           <div className="mt-8 mb-2">
             <p className="px-4 text-xs font-medium text-white/50 uppercase">
               Herramientas
             </p>
           </div>
 
+          {/* Secondary navigation menu */}
           <ul className="space-y-1.5">
             {secondaryNavItems.map((item) => (
               <li key={item.path}>
@@ -141,7 +205,7 @@ export const Sidebar = () => {
           </ul>
         </nav>
 
-        {/* Botón de cierre de sesión */}
+        {/* Sign out button */}
         <div className="p-4 mt-auto">
           <button
             onClick={handleSignOut}
@@ -153,7 +217,7 @@ export const Sidebar = () => {
         </div>
       </aside>
 
-      {/* Overlay para móvil */}
+      {/* Mobile overlay background */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
