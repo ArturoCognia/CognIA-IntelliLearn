@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { FaRobot, FaPaperPlane, FaLightbulb, FaBookReader, FaChartLine, FaMicrophone, FaStop } from 'react-icons/fa'
+import { chatWithAI } from '@/lib/firebase'
 
 type Message = {
   id: string
@@ -28,6 +29,9 @@ export const AssistantAI = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(true)
+  const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([
+    { role: 'model', content: 'Hola, soy tu asistente de aprendizaje IA. ¿En qué puedo ayudarte hoy?' }
+  ])
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Temas sugeridos
@@ -36,23 +40,6 @@ export const AssistantAI = () => {
     { id: '2', title: 'Resumir mi próxima lección', icon: <FaBookReader /> },
     { id: '3', title: 'Analizar mi progreso en el curso', icon: <FaChartLine /> }
   ]
-
-  // Función para simular respuestas del asistente
-  const generateAIResponse = (userMessage: string): Promise<string> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (userMessage.toLowerCase().includes('regresión') || userMessage.toLowerCase().includes('regresion')) {
-          resolve('La regresión lineal es un algoritmo de aprendizaje supervisado que predice un valor continuo basado en variables independientes. Se utiliza para encontrar la relación lineal entre una variable dependiente y una o más variables independientes. La fórmula básica es y = mx + b, donde m es la pendiente y b el intercepto. ¿Te gustaría que profundice en algún aspecto específico?')
-        } else if (userMessage.toLowerCase().includes('resumen') || userMessage.toLowerCase().includes('resumir')) {
-          resolve('Tu próxima lección es "Herramientas y entorno de desarrollo" con una duración de 20 minutos. Aprenderás sobre los frameworks y bibliotecas más utilizados en Machine Learning como Scikit-learn, TensorFlow y PyTorch, así como entornos de desarrollo como Jupyter Notebooks y Google Colab. ¿Necesitas alguna preparación previa para esta lección?')
-        } else if (userMessage.toLowerCase().includes('progreso') || userMessage.toLowerCase().includes('avance')) {
-          resolve('Has completado el 25% del curso "Introducción al Machine Learning". Tienes 3 lecciones completadas y 9 por completar. Tu ritmo de avance es bueno, estás ligeramente por encima del promedio de otros estudiantes. Te recomiendo enfocarte en completar el módulo "Algoritmos de Machine Learning" esta semana para mantener tu momentum.')
-        } else {
-          resolve('Entiendo tu consulta. Como asistente de aprendizaje personalizado, puedo ayudarte con explicaciones de conceptos, resúmenes de lecciones, análisis de tu progreso, recomendaciones de estudio personalizadas, y responder preguntas específicas sobre el contenido del curso. ¿Hay algo más específico en lo que pueda ayudarte?')
-        }
-      }, 1500)
-    })
-  }
 
   // Auto-scroll a mensajes nuevos
   useEffect(() => {
@@ -75,19 +62,37 @@ export const AssistantAI = () => {
     setShowSuggestions(false)
     setIsLoading(true)
     
-    // Simular respuesta del AI
-    const aiResponse = await generateAIResponse(userMessage.text)
+    // Actualizar historial de chat
+    const newChatHistory = [...chatHistory, { role: 'user', content: userMessage.text }];
+    setChatHistory(newChatHistory);
     
-    // Agregar respuesta del AI
-    const aiMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      text: aiResponse,
-      sender: 'ai',
-      timestamp: new Date()
+    try {
+      // Obtener respuesta de Gemini AI
+      const aiResponseText = await chatWithAI(newChatHistory);
+      
+      // Agregar respuesta del AI
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: aiResponseText,
+        sender: 'ai',
+        timestamp: new Date()
+      }
+      
+      setMessages(prev => [...prev, aiMessage]);
+      setChatHistory(prev => [...prev, { role: 'model', content: aiResponseText }]);
+    } catch (error) {
+      console.error('Error al obtener respuesta de IA:', error);
+      // Agregar mensaje de error
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: 'Lo siento, ha ocurrido un error. Por favor, intenta de nuevo más tarde.',
+        sender: 'ai',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setMessages(prev => [...prev, aiMessage])
-    setIsLoading(false)
   }
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -117,7 +122,7 @@ export const AssistantAI = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Asistente IA</h1>
-        <p className="text-gray-600">Tu tutor personalizado impulsado por inteligencia artificial</p>
+        <p className="text-gray-600">Tu tutor personalizado impulsado por inteligencia artificial Gemini</p>
       </div>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-[calc(100vh-220px)]">
@@ -128,7 +133,7 @@ export const AssistantAI = () => {
           </div>
           <div>
             <h2 className="font-semibold">CognIA Assistant</h2>
-            <p className="text-xs text-white/80">Siempre disponible para ayudarte</p>
+            <p className="text-xs text-white/80">Potenciado por Gemini AI</p>
           </div>
         </div>
 

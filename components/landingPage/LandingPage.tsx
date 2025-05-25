@@ -3,7 +3,8 @@ import React from 'react'
 import Image from 'next/image';
 import { FaUniversity, FaGraduationCap, FaStar } from 'react-icons/fa';
 import { TbUserShare } from 'react-icons/tb';
-import './landingPage.css'
+import { FcGoogle } from 'react-icons/fc';
+import { signIn } from 'next-auth/react';
 import AutoCarousel from '../autoCarrousel/autoCarrousel';
 
 export default function LandingPage() {
@@ -250,26 +251,27 @@ export default function LandingPage() {
             <section className="relative bg-gradient-to-r from-[#0B0D2A] to-[#2A1E90] py-20 text-white text-center rounded-2xl shadow-lg mx-4 md:mx-6 overflow-hidden">
                 {/* SVG izquierdo */}
                 <div className="absolute left-0 top-0 h-full w-1/2">
-                <Image
-                                className="h-full w-full object-cover"
-                                src={'/assets/images/TexturaLeft.svg'}
-                                alt="textura-left"
-                                width={541}
-                                height={281}
-                                quality={100}
-                            />
+                    <Image
+                        className="h-full w-full object-cover"
+                        src={'/assets/images/TexturaLeft.svg'}
+                        alt="textura-left"
+                        width={541}
+                        height={281}
+                        quality={100}
+                    />
                 </div>
 
                 {/* SVG derecho */}
                 <div className="absolute right-0 top-0 h-full w-1/2">
-                <Image
-                                className="h-full w-full object-cover"
-                                src={'/assets/images/TexturaReight.svg'}
-                                alt="textura-left"
-                                width={541}
-                                height={281}
-                                quality={100}
-                            />                </div>
+                    <Image
+                        className="h-full w-full object-cover"
+                        src={'/assets/images/TexturaReight.svg'}
+                        alt="textura-left"
+                        width={541}
+                        height={281}
+                        quality={100}
+                    />
+                </div>
 
                 {/* Contenido */}
                 <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6">
@@ -277,12 +279,19 @@ export default function LandingPage() {
                         ¿Listo para digitalizar tu oferta académica?
                     </h2>
                     <p className="text-base sm:text-lg md:text-[20px] mb-8">
-                        Nuestro asistente virtual te guiará en el proceso de implementación
-                        de carreras en línea adaptadas a tu institución.
+                        Comienza ahora iniciando sesión con tu cuenta de Google para acceder 
+                        a todas las herramientas de aprendizaje.
                     </p>
-                    <div className="flex justify-center">
-                        <button className="bg-white text-[#2A1E90] font-semibold px-6 py-3 rounded-full shadow-md hover:bg-gray-100 transition flex items-center gap-2">
-                            <span className="w-2 h-2 bg-[#2A1E90] rounded-full"></span>
+                    <div className="flex flex-col md:flex-row gap-4 justify-center">
+                        <button 
+                            onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+                            className="bg-white text-[#2A1E90] font-semibold px-6 py-3 rounded-full shadow-md hover:bg-gray-100 transition flex items-center gap-2 justify-center"
+                        >
+                            <FcGoogle className="text-xl" />
+                            Iniciar con Google
+                        </button>
+                        <button className="bg-transparent border-2 border-white text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-white/10 transition flex items-center gap-2 justify-center">
+                            <span className="w-2 h-2 bg-white rounded-full"></span>
                             Solicitar Demo
                         </button>
                     </div>

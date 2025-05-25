@@ -1,1 +1,16 @@
-{}
+{
+  "/_app": "pages/_app.js",
+  "/dashboard/analytics": "pages/dashboard/analytics.html",
+  "/dashboard/assignments": "pages/dashboard/assignments.html",
+  "/_error": "pages/_error.js",
+  "/dashboard/assistant": "pages/dashboard/assistant.html",
+  "/dashboard/content": "pages/dashboard/content.html",
+  "/dashboard/courses": "pages/dashboard/courses.html",
+  "/dashboard/gamification": "pages/dashboard/gamification.html",
+  "/": "pages/index.html",
+  "/dashboard": "pages/dashboard.html",
+  "/dashboard/certificates": "pages/dashboard/certificates.html",
+  "/dashboard/profile": "pages/dashboard/profile.html",
+  "/_document": "pages/_document.js",
+  "/404": "pages/404.html"
+}
